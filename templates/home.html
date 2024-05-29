@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Home</title>
+
+        <!--  CSS -->
+        <link rel="stylesheet" href="../static/css/style.css">
+        <link rel="stylesheet" href="../static/css/bootstrap.css">
+        <link rel="stylesheet" href="../static/css/ant-style.css">
+
+        <!-- JS -->
+        <script src="../static/js/jquery-3.5.1.js"></script>
+
+    </head>
+
+    <body style="overflow: hidden; position: relative; background-image: none; ">
+
+      <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="padding-bottom: 0;">
+        <div class="container" style="margin-bottom: 0.5vw; justify-content: normal; max-width: 100%;">
+          <img class="navbar-brand ms-4" src="https://static.igem.wiki/teams/4659/wiki/team-logo1.png" width="70px" height="70px" alt="system logo">
+          <!---- 系统名 ---->
+          <a class="navbar-brand" href="#" style="color: palegoldenrod;">图书管理系统</a>
+        </div>
+      </nav>
+        
+        <div class="home" style="white-space: nowarp;">
+          <div class="home-title page-title">
+            图书管理系统
+          </div>
+          <div class="home-login" style="opacity: 0.8;">
+            <div class="login-select">
+              <button class="login-button" id="login_button">登录</button>
+              <button class="register-button" id="register_button">注册</button>
+            </div>
+            <div class="login-texts">
+              <form action="/login-submit" method="post" target="_blank" id="login_form" class="login-form">
+                <div class="row">
+                  
+                  <div>
+                    <label for="name" class="input-label" title="学号/工号">学号/工号</label>
+                    <div class="input-text">
+                      <textarea rows="1" cols="40" form="[object Object]" type="text" name="lID" id="lID" data-__meta="[object Object]" data-__field="[object Object]" value=""></textarea>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label for="name" class="input-label" title="密码">密码</label>
+                    <div class="input-text">
+                      <textarea rows="1" cols="40" form="[object Object]" type="text" name="lpassword" id="lpassword" data-__meta="[object Object]" data-__field="[object Object]" value=""></textarea>
+                    </div>
+                  </div>
+                  
+                  <button type="submit" id="login_submit" class="ant-btn buttonPrimary btnPrimary submit-box">
+                    <span>登录</span>
+                  </button>
+                  
+                </div>
+              </form>
+
+              <form action="/register-submit" method="post" target="_blank" id="register_form" class="login-form" style="display: none;">
+                <div class="row">
+                  
+                  <div>
+                    <label for="name" class="input-label" title="学号/工号">学号/工号</label>
+                    <div class="input-text">
+                      <textarea rows="1" cols="40" form="[object Object]" type="text" name="rID" id="rID" data-__meta="[object Object]" data-__field="[object Object]" value=""></textarea>
+                    </div>
+                  </div>
+
+                  <div style="display: flex;">
+                    <div style="width: 50%;">
+                      <label for="name" class="input-label" title="姓名">姓名</label>
+                      <div class="input-text">
+                        <textarea rows="1" cols="15" form="[object Object]" type="text" name="name" id="name" data-__meta="[object Object]" data-__field="[object Object]" value=""></textarea>
+                      </div>
+                    </div>
+                    <div style="width: 50%;">
+                      <label for="name" class="input-label" title="性别">性别</label>
+                      <div class="input-text">
+                        <input type="radio" id="male" name="sex" value=1>
+                        <label for="male">男</label>
+                        <input type="radio" id="female" name="sex" value=0 checked>
+                        <label for="female">女</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label for="name" class="input-label" title="机构">机构</label>
+                    <div class="input-text">
+                      <textarea rows="1" cols="40" form="[object Object]" type="text" name="institution" id="institution" data-__meta="[object Object]" data-__field="[object Object]" value=""></textarea>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label for="name" class="input-label" title="联系方式">联系方式</label>
+                    <div class="input-text">
+                      <textarea rows="1" cols="40" form="[object Object]" type="text" name="phone" id="phone" data-__meta="[object Object]" data-__field="[object Object]" value=""></textarea>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label for="name" class="input-label" title="密码">密码</label>
+                    <div class="input-text">
+                      <textarea rows="1" cols="40" form="[object Object]" type="text" name="rpassword" id="rpassword" data-__meta="[object Object]" data-__field="[object Object]" value=""></textarea>
+                    </div>
+                  </div>
+                  
+                  <button type="submit" id="register_submit" class="ant-btn buttonPrimary btnPrimary submit-box">
+                    <span>注册</span>
+                  </button>
+                  
+                </div>
+              </form>
+
+              <script>
+                var uid;
+
+                var login_b = document.getElementById('login_button');
+                var register_b = document.getElementById('register_button');
+
+                login_b.onclick = function() {
+                  document.getElementById('login_form').removeAttribute('style');
+                  document.getElementById('login_button').removeAttribute('style');
+                  document.getElementById('login_button').setAttribute('style', 'background-color:rgb(28, 119, 237); border-radius: 30px 30px 0 0; color:#fff');
+                  document.getElementById('register_button').removeAttribute('style');
+                  document.getElementById('register_button').setAttribute('style', 'background-color:azure; border-radius: 0 30px 0 0;');
+                  document.getElementById('register_form').setAttribute('style', 'display:none');
+                };
+
+                register_b.onclick = function() {
+                  document.getElementById('register_form').removeAttribute('style');
+                  document.getElementById('register_button').removeAttribute('style');
+                  document.getElementById('register_button').setAttribute('style', 'background-color:rgb(28, 119, 237); border-radius: 30px 30px 0 0; color:#fff');
+                  document.getElementById('login_button').removeAttribute('style');
+                  document.getElementById('login_button').setAttribute('style', 'background-color:azure; border-radius: 30px 0 0 0; color:black');
+                  document.getElementById('login_form').setAttribute('style', 'display:none');
+                };
+            
+                $(function(){
+                    $("#login_form").submit(function(e){
+                        e.preventDefault();
+                        
+                        uid=$("#lID").val();
+                        let password=$("#lpassword").val();
+  
+                        var loading=document.getElementById("loading");
+                        loading.removeAttribute('style');
+                        loading.setAttribute('style', 'visibility: visible;');
+                        
+                        $.ajax({
+                            url:"/login-submit",//要请求的服务器url
+                            data:{
+                                uid : uid,
+                                password : password
+                            },
+                            async:true,//是否是异步请求
+                            cache:false,//是否缓存结果
+                            type:"POST",//请求方式
+                            success:function(data){//函数会在服务器执行成功后执行，result就是服务器返回结果
+                                //alert('submit successfully!');
+                                
+                                var loading=document.getElementById("loading");
+                                loading.removeAttribute('style');
+                                loading.setAttribute('style', 'visibility: hidden;');
+                                
+                                var temp = encodeURIComponent(uid);
+                                if(data == "success s") {
+                                  window.location.href = "{{ url_for('workland_s') }}"+"?uid="+temp+"&ustatus=0";
+                                }
+                                else if(data == "success m") {
+                                  window.location.href = "{{ url_for('workland_m') }}"+"?uid="+temp+"&ustatus=1";
+                                }
+                                else if(data == "nregistered") {
+                                  alert("账号未注册");
+                                }
+                                else if(data == "nequal") {
+                                  alert("密码错误");
+                                }
+                            },
+                            error:function(jqXHR, textStatus, errorThrown) {
+                                alert('Error!');
+                                var loading=document.getElementById("loading");
+                                loading.removeAttribute('style');
+                                loading.setAttribute('style', 'visibility: hidden;');
+                            }
+                        });
+  
+                    });
+                });
+
+                $(function(){
+                    $("#register_form").submit(function(e){
+                        e.preventDefault();
+                        
+                        let uid=$("#rID").val();
+                        let name=$("#name").val();
+                        let sex=$("input[name='sex']:checked").val();
+                        let institution=$("#institution").val();
+                        let phone=$("#phone").val();
+                        let password=$("#rpassword").val();
+  
+                        var loading=document.getElementById("loading");
+                        loading.removeAttribute('style');
+                        loading.setAttribute('style', 'visibility: visible;');
+                        
+                        $.ajax({
+                            url:"/register-submit",//要请求的服务器url
+                            data:{
+                                uid : uid,
+                                name : name,
+                                sex : sex,
+                                institution : institution,
+                                phone : phone,
+                                password : password
+                            },
+                            async:true,//是否是异步请求
+                            cache:false,//是否缓存结果
+                            type:"POST",//请求方式
+                            success:function(data){//函数会在服务器执行成功后执行，result就是服务器返回结果
+                                //alert('submit successfully!');
+                                
+                                var loading=document.getElementById("loading");
+                                loading.removeAttribute('style');
+                                loading.setAttribute('style', 'visibility: hidden;');
+  
+                                if(data == "注册成功") {
+                                  alert("注册成功！");
+                                  window.location.href = "{{ url_for('workland_s') }}"+"?uid="+encodeURIComponent(uid)+"&ustatus=0";
+                                }
+                                else {
+                                  alert(data);
+                                }
+                            },
+                            error:function(jqXHR, textStatus, errorThrown) {
+                                alert('Failed!');
+                                var loading=document.getElementById("loading");
+                                loading.removeAttribute('style');
+                                loading.setAttribute('style', 'visibility: hidden;');
+                            }
+                        });
+  
+                    });
+                });
+              </script>
+
+            </div>
+          </div>
+        </div>
+        
+        <footer>
+
+        </footer>
+    </body>
+
+    <div class="cssloader" id="loading" style="visibility: hidden;">
+      <div class="sh1"></div>
+      <div class="sh2"></div>
+      <h4 class="lt">loading</h4>
+    </div>
+    
+</html>

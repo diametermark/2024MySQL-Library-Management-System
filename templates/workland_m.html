@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Workland</title>
+
+        <!--  CSS -->
+        <link rel="stylesheet" href="../static/css/style.css">
+        <link rel="stylesheet" href="../static/css/bootstrap.css">
+        <link rel="stylesheet" href="../static/css/ant-style.css">
+
+        <!-- JS -->
+        <script src="../static/js/jquery-3.5.1.js"></script>
+        <script src="../static/js/myjs.js"></script>
+
+    </head>
+
+    <body style="overflow: hidden; position: relative; background-image: none; ">
+        <script>
+          const params = new URLSearchParams(window.location.search);
+          const uid = params.get('uid');
+          const ustatus = params.get('ustatus');
+          
+        </script>
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="padding-bottom: 0;">
+            <div class="container" style="margin-bottom: 0.5vw; justify-content: normal; max-width: 100%;">
+              <img class="navbar-brand ms-4" src="https://static.igem.wiki/teams/4659/wiki/team-logo1.png" width="70px" height="70px" alt="system logo">
+              <!---- 系统名 ---->
+              <a class="navbar-brand" href="#" style="color: palegoldenrod;">图书管理系统</a>
+          
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ml-auto left-aligned" style="flex-grow: 0.43;">
+          
+                  <!---- HOME ---->
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('home') }}">首页</a>
+                  </li>
+
+                  <!---- Workland ---->
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('workland_s') }}">我的</a>
+                  </li>
+
+                  <li class="nav-item">
+                    <p id="welcome" style="padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x);"></p>
+                  </li>
+          
+                </ul>
+                
+              </div>
+            </div>
+            <script>
+              var p = document.getElementById("welcome");
+              p.innerHTML = "欢迎\t"+uid;
+            </script>
+        </nav>
+        
+        <div class="select_view">
+          <div class="select_box" id="myquery_btn" style="background-color: bisque;">
+            <img class="select_icon" src="../static/pictures/query.png">
+            <div class="select_title">书籍管理</div>
+          </div>
+          <div class="select_box" id="myborrow_btn">
+            <img class="select_icon" src="../static/pictures/borrow.png">
+            <div class="select_title">借阅记录</div>
+          </div>
+          <div class="select_box" id="myreserve_btn">
+            <img class="select_icon" src="../static/pictures/reverse.png">
+            <div class="select_title">预约记录</div>
+          </div>
+          <div class="select_box" id="myoverdue_btn">
+            <img class="select_icon" src="../static/pictures/overdue.png">
+            <div class="select_title">违期记录</div>
+          </div>
+          <div class="search_box" id="mysearch">
+            <form action="/user-query" method="post" target="_blank" id="user_query_form" style="display: flex;">
+              <input type="text" id="search_in" name="bname">
+              <img id="search" class="select_icon" src="../static/pictures/search.png">
+            </form>
+
+            <script>
+              document.addEventListener("DOMContentLoaded", function() {
+                var search = document.getElementById("search");
+                search.addEventListener("click", function(e) {
+                    e.preventDefault(); // 阻止表单默认提交行为
+
+                    var bname = document.getElementById("search_in").value;
+
+                    var loading = document.getElementById("loading");
+                    loading.style.visibility = 'visible'; // 显示加载指示器
+
+                    $.ajax({
+                        url: "/user-query",
+                        data: { bname: bname },
+                        type: "POST",
+                        success: function(data) {
+                            loading.style.visibility = 'hidden'; // 隐藏加载指示器
+                            if (data.length == 0) {
+                                alert("未找到该书籍！");
+                            } else {
+                                query_all(data, uid, ustatus);
+                            }
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            loading.style.visibility = 'hidden'; // 隐藏加载指示器
+                            alert('Error!');
+                        }
+                    });
+                });
+              });
+
+              
+            </script>
+          </div>
+
+          <div class="select_box" style="cursor: default;">
+            <div class="select_title">当前藏书总数:</div>
+            <div class="select_title" id="booknum"></div>
+          </div>
+        </div>
+
+        <div style="width: 50%; height: 80px; margin: 0 auto; display: flex; align-items: center;">
+          <button id="add_button" class="add_button">添加书籍</button>
+        </div>
+
+        <!-- Modal Structure -->
+        <div id="editModal" class="modal">
+          <div class="modal-content">
+            <h4>修改书籍信息</h4>
+            <div style="display: flex;">
+              <form id="editForm" style="width: 60%;">
+                <input type="hidden" id="modalBid" name="bid">
+                <div class="input-field">
+                  <label for="modalBname">书名</label>
+                  <input type="text" id="modalBname" name="bname">
+                </div>
+                <div class="input-field">
+                  <label for="modalAuthor">作者</label>
+                  <input type="text" id="modalAuthor" name="author">
+                </div>
+                <div class="input-field">
+                  <label for="modalDeposit">藏馆</label>
+                  <input type="text" id="modalDeposit" name="deposit">
+                </div>
+                <div class="input-field">
+                  <label for="modalPicture">图片</label>
+                  <input type="file" id="modalPicture" name="picture" accept=".bmp, .png, .jpg">
+                </div>
+                <button type="button" class="btn" onclick="uploadImage()">提交修改</button>
+              </form>
+              <script>
+                function uploadImage() {
+                  const form = document.getElementById('editForm');
+                  const formData = new FormData(form);
+                  form.append('uid', uid);
+
+                  fetch('/book-update', {
+                      method: 'POST',
+                      body: formData
+                  })
+                  .then(response => response.json())
+                  .then(data => {
+                      if (data.success) {
+                          alert('Update successful');
+                          var mypicture = document.getElementById('cur_pic');
+                          mypicture.src = "../"+data.file_path;
+                      } else {
+                          alert('Update failed: ' + data.error);
+                      }
+                  })
+                  .catch(error => {
+                      alert('Error: ' + error);
+                  });
+                }
+              </script>
+              <img src="" alt="book picture" style="width: 150px; height: 200px;" id="cur_pic">
+            </div>
+            
+            <div class="modal-footer">
+              <a href="#!" class="modal-close btn">关闭</a>
+            </div>
+          </div>
+          
+        </div>
+
+        <div id="addModal" class="modal">
+          <div class="modal-content">
+            <h4>添加书籍信息</h4>
+            <div style="display: flex;">
+              <form id="addForm" style="width: 60%;">
+                <div class="input-field">
+                  <label for="addBid">书籍编号</label>
+                  <input type="text" id="addBid" name="bid">
+                </div>
+                <div class="input-field">
+                  <label for="addBname">书名</label>
+                  <input type="text" id="addBname" name="bname">
+                </div>
+                <div class="input-field">
+                  <label for="addAuthor">作者</label>
+                  <input type="text" id="addAuthor" name="author">
+                </div>
+                <div class="input-field">
+                  <label for="addDeposit">藏馆</label>
+                  <input type="text" id="addDeposit" name="deposit">
+                </div>
+                <div class="input-field">
+                  <label for="addPicture">图片</label>
+                  <input type="file" id="addPicture" name="picture" accept=".bmp, .png, .jpg">
+                </div>
+                <button type="button" class="btn" onclick="uploadImage1()">提交</button>
+              </form>
+              <script>
+                function uploadImage1() {
+                  const form = document.getElementById('addForm');
+                  const formData = new FormData(form);
+                  form.append('uid', uid);
+
+                  fetch('/book-add', {
+                      method: 'POST',
+                      body: formData
+                  })
+                  .then(response => response.json())
+                  .then(data => {
+                      if (data.success) {
+                          alert('Add successful');
+                      } else {
+                          alert('Add failed: ' + data.error);
+                      }
+                  })
+                  .catch(error => {
+                      alert('Error: ' + error);
+                  });
+                }
+              </script>
+            </div>
+            
+            <div class="modal-footer">
+              <a href="#!" id="add-close" class="modal-close btn">关闭</a>
+            </div>
+          </div>
+          
+        </div>
+
+
+        <div class="table_view">
+          <table id="table">
+            <thead id="myhead">
+
+            </thead>
+            <tbody id="mytable">
+
+            </tbody>
+          </table>
+        </div>
+
+        <script>
+          $(document).ready(function(){
+            var loading=document.getElementById("loading");
+            loading.style.visibility = 'visible';
+
+            $.ajax({
+                url:"/book-count",//要请求的服务器url
+                async:true,//是否是异步请求
+                cache:false,//是否缓存结果
+                type:"GET",//请求方式
+                success:function(data){//函数会在服务器执行成功后执行，result就是服务器返回结果
+                    //alert('submit successfully!');
+                    
+                    var loading=document.getElementById("loading");
+                    loading.style.visibility = 'hidden';
+                    
+                    var num = document.getElementById("booknum");
+                    num.textContent = data;
+
+                    $.ajax({
+                      url:"/user-query-all",//要请求的服务器url
+                      async:true,//是否是异步请求
+                      cache:false,//是否缓存结果
+                      type:"GET",//请求方式
+                      success:function(data){//函数会在服务器执行成功后执行，result就是服务器返回结果
+                          //alert('submit successfully!');
+                          
+                          var loading=document.getElementById("loading");
+                          loading.style.visibility = 'hidden';
+                          
+                          if(data.length == 0) alert("未找到该书籍！");
+                          else {
+                            query_all(data, uid, ustatus);
+                          }
+                      },
+                      error:function(jqXHR, textStatus, errorThrown) {
+                          alert('Error!');
+                          var loading=document.getElementById("loading");
+                          loading.style.visibility = 'hidden';
+                      }
+                  });
+                },
+                error:function(jqXHR, textStatus, errorThrown) {
+                    alert('Error!');
+                    var loading=document.getElementById("loading");
+                    loading.style.visibility = 'hidden';
+                }
+            });
+          })
+        </script>
+        <script>
+          var myquery_btn = document.getElementById("myquery_btn");
+          var myborrow_btn = document.getElementById("myborrow_btn");
+          var myreserve_btn = document.getElementById("myreserve_btn");
+          var myoverdue_btn = document.getElementById("myoverdue_btn");
+          var search_btn = document.getElementById("mysearch");
+
+          myquery_btn.onclick = function() {
+            myborrow_btn.removeAttribute('style');
+            myreserve_btn.removeAttribute('style');
+            myoverdue_btn.removeAttribute('style');
+            myquery_btn.setAttribute('style', 'background-color: bisque');
+            search_btn.removeAttribute('style');
+
+            var loading=document.getElementById("loading");
+            loading.style.visibility = 'visible';
+
+            $.ajax({
+                url:"/user-query-all",//要请求的服务器url
+                async:true,//是否是异步请求
+                cache:false,//是否缓存结果
+                type:"GET",//请求方式
+                success:function(data){//函数会在服务器执行成功后执行，result就是服务器返回结果
+                    //alert('submit successfully!');
+                    
+                    var loading=document.getElementById("loading");
+                    loading.style.visibility = 'hidden';
+                    
+                    query_all(data, uid, ustatus);
+                },
+                error:function(jqXHR, textStatus, errorThrown) {
+                    alert('Error!');
+                    var loading=document.getElementById("loading");
+                    loading.style.visibility = 'hidden';
+                }
+            });
+          };
+
+          myborrow_btn.onclick = function() {
+            myborrow_btn.setAttribute('style', 'background-color: bisque');
+            myreserve_btn.removeAttribute('style');
+            myoverdue_btn.removeAttribute('style');
+            myquery_btn.removeAttribute('style');
+            search_btn.style.display = 'none';
+
+            var loading=document.getElementById("loading");
+            loading.style.visibility = 'visible';
+
+            $.ajax({
+                url:"/query-all-borrow",//要请求的服务器url
+                async:true,//是否是异步请求
+                cache:false,//是否缓存结果
+                type:"GET",//请求方式
+                success:function(data){//函数会在服务器执行成功后执行，result就是服务器返回结果
+                    //alert('submit successfully!');
+                    
+                    var loading=document.getElementById("loading");
+                    loading.style.visibility = 'hidden';
+                    
+                    m_query_borrow(data);
+                },
+                error:function(jqXHR, textStatus, errorThrown) {
+                    alert('Error!');
+                    var loading=document.getElementById("loading");
+                    loading.style.visibility = 'hidden';
+                }
+            });
+          };
+
+          myreserve_btn.onclick = function() {
+            myborrow_btn.removeAttribute('style');
+            myreserve_btn.setAttribute('style', 'background-color: bisque');
+            myoverdue_btn.removeAttribute('style');
+            myquery_btn.removeAttribute('style');
+            search_btn.setAttribute('style', 'display: none');
+
+            var loading=document.getElementById("loading");
+            loading.style.visibility = 'visible';
+
+            $.ajax({
+                url:"/query-all-reserve",//要请求的服务器url
+                data: {
+                  uid : uid
+                },
+                async:true,//是否是异步请求
+                cache:false,//是否缓存结果
+                type:"POST",//请求方式
+                success:function(data){//函数会在服务器执行成功后执行，result就是服务器返回结果
+                    //alert('submit successfully!');
+                    
+                    var loading=document.getElementById("loading");
+                    loading.removeAttribute('style');
+                    loading.setAttribute('style', 'visibility: hidden;');
+                    
+                    m_query_reserve(data);
+                },
+                error:function(jqXHR, textStatus, errorThrown) {
+                    alert('Error!');
+                    var loading=document.getElementById("loading");
+                    loading.removeAttribute('style');
+                    loading.setAttribute('style', 'visibility: hidden;');
+                }
+            });
+          };
+
+          myoverdue_btn.onclick = function() {
+            myborrow_btn.removeAttribute('style');
+            myreserve_btn.removeAttribute('style');
+            myoverdue_btn.setAttribute('style', 'background-color: bisque');
+            myquery_btn.removeAttribute('style');
+            search_btn.setAttribute('style', 'display: none');
+
+            var loading=document.getElementById("loading");
+            loading.removeAttribute('style');
+            loading.setAttribute('style', 'visibility: visible;');
+
+            $.ajax({
+                url:"/query-all-overdue",//要请求的服务器url
+                async:true,//是否是异步请求
+                cache:false,//是否缓存结果
+                type:"GET",//请求方式
+                success:function(data){//函数会在服务器执行成功后执行，result就是服务器返回结果
+                    //alert('submit successfully!');
+                    
+                    var loading=document.getElementById("loading");
+                    loading.removeAttribute('style');
+                    loading.setAttribute('style', 'visibility: hidden;');
+                    
+                    m_query_overdue(data);
+                },
+                error:function(jqXHR, textStatus, errorThrown) {
+                    alert('Error!');
+                    var loading=document.getElementById("loading");
+                    loading.removeAttribute('style');
+                    loading.setAttribute('style', 'visibility: hidden;');
+                }
+            });
+          };
+        </script>
+        
+    </body>
+
+    <div class="cssloader" id="loading" style="visibility: hidden;">
+      <div class="sh1"></div>
+      <div class="sh2"></div>
+      <h4 class="lt">loading</h4>
+    </div>
+    
+</html>
