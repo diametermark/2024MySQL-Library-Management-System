@@ -1,6 +1,5 @@
-from flask import Flask, request, jsonify, redirect
-from flask import render_template, url_for
-from flask_mysqldb import MySQL
+from flask import Flask, request, jsonify
+from flask import render_template
 import MySQLdb
 import os
 from werkzeug.utils import secure_filename
@@ -46,15 +45,12 @@ def login():
     cursor.execute("select password, ustatus from user where uid = %s", (uid,))
     data = cursor.fetchall()
     cursor.close()
-    print(data)
-    print(password)
-    print(data[0][0])
 
-    if (len(data) and data[0][0] == password and data[0][1] == 0):
+    if (len(data) and len(data[0]) and data[0][0] == password and data[0][1] == 0):
         return "success s"
-    elif len(data) and data[0][0] == password and data[0][1] == 1 :
+    elif len(data) and len(data[0]) and data[0][0] == password and data[0][1] == 1 :
         return "success m"
-    elif (not len(data)):
+    elif (not len(data) or not len(data[0])):
         return "nregistered"
     else:
         return "nequal"
@@ -69,7 +65,6 @@ def register():
     institution=str(request.form.get('institution'))
     phone=str(request.form.get('phone'))
     password=str(request.form.get('password'))
-    print(type(sex_c))
     
 
     if(len(uid) != 10):
@@ -97,8 +92,6 @@ def queryall():
         data = cursor.fetchall()
         cursor.close()
 
-        #print(list(data))
-
         return list(data)
         
     except Exception as e:
@@ -114,8 +107,6 @@ def userquery():
         data = cursor.fetchall()
         cursor.close()
 
-        #print(list(data))
-
         return list(data)
         
     except Exception as e:
@@ -130,7 +121,6 @@ def queryuserborrow():
         cursor.execute("select book_ID, bname, borrow_Date, return_Date, overdue_Date, is_overdued from borrow, book1 where bid = book_ID and reader_ID = %s;", (uid,))
         data = cursor.fetchall()
         cursor.close()
-        print(data)
         return list(data)
         
     except Exception as e:
@@ -144,7 +134,6 @@ def queryallborrow():
         cursor.execute("select reader_ID, uname, book_ID, bname, borrow_Date, return_Date, overdue_Date, is_overdued from borrow, book1, user where bid = book_ID and uid = reader_ID;")
         data = cursor.fetchall()
         cursor.close()
-        print(data)
         return list(data)
         
     except Exception as e:
@@ -159,7 +148,6 @@ def queryuserreserve():
         cursor.execute("select book_ID, bname, reserve_Date from reserve, book1 where bid = book_ID and reader_ID = %s;", (uid,))
         data = cursor.fetchall()
         cursor.close()
-        print(data)
         return list(data)
         
     except Exception as e:
@@ -173,7 +161,6 @@ def queryallreserve():
         cursor.execute("select reader_ID, uname, book_ID, bname, reserve_Date from reserve, book1, user where bid = book_ID and reader_ID = uid;")
         data = cursor.fetchall()
         cursor.close()
-        print(data)
         return list(data)
         
     except Exception as e:
@@ -188,7 +175,6 @@ def queryuseroverdue():
         cursor.execute("select book_ID, bname, overdue_Time, dedit from overdue, book1 where bid = book_ID and reader_ID = %s;", (uid,))
         data = cursor.fetchall()
         cursor.close()
-        print(data)
         return list(data)
         
     except Exception as e:
@@ -202,7 +188,6 @@ def queryalloverdue():
         cursor.execute("select reader_ID, uname, book_ID, bname, overdue_Time, dedit from overdue, book1, user where bid = book_ID and reader_ID = uid;")
         data = cursor.fetchall()
         cursor.close()
-        print(data)
         return list(data)
         
     except Exception as e:
@@ -222,7 +207,6 @@ def userborrow():
         cursor.execute("insert into logs (uid, action) VALUES (%s, %s)", (uid, 'User borrow '+bid))
         db.commit()
         cursor.close()
-        print(data)
         return "借阅成功"
         
     except Exception as e:
@@ -243,7 +227,7 @@ def userreserve():
         cursor.execute("insert into logs (uid, action) VALUES (%s, %s)", (uid, 'User reserve '+bid))
         db.commit()
         cursor.close()
-        print(data)
+        #print(data)
         return "预约成功"
         
     except Exception as e:
@@ -264,7 +248,7 @@ def usercancel():
         cursor.execute("insert into logs (uid, action) VALUES (%s, %s)", (uid, 'User cancel '+bid))
         db.commit()
         cursor.close()
-        print(data)
+        #print(data)
         return "取消预约成功"
         
     except Exception as e:
@@ -285,7 +269,7 @@ def userreturn():
         cursor.execute("insert into logs (uid, action) VALUES (%s, %s)", (uid, 'User return '+bid))
         db.commit()
         cursor.close()
-        print(data)
+        #print(data)
         return "还书成功"
     except Exception as e:
         print(str(e))
@@ -299,7 +283,7 @@ def bookcount():
         cursor.execute("select bookNum();")
         data = cursor.fetchone()
         cursor.close()
-        print(data)
+        #print(data)
         return str(data[0])
     except Exception as e:
         print(str(e))
@@ -318,7 +302,7 @@ def bookdelete():
         cursor.execute("insert into logs (uid, action) VALUES (%s, %s)", (uid, 'Manager delete '+bid))
         db.commit()
         cursor.close()
-        print(data)
+        #print(data)
         return "删除成功"
         
     except Exception as e:
@@ -344,7 +328,7 @@ def bookupdate():
                 file.save(picture)
     else:
         picture = ''
-    print(picture)
+    #print(picture)
     try:
         cursor = db.cursor()
         cursor.execute("START TRANSACTION")  # 开始事务
@@ -387,7 +371,7 @@ def bookadd():
                 file.save(picture)
     else:
         picture = ''
-    print(picture)
+    #print(picture)
     try:
         cursor = db.cursor()
         cursor.execute("START TRANSACTION")  # 开始事务
